@@ -1,19 +1,15 @@
 from datetime import datetime
 from flask import Flask, render_template, url_for, request, redirect
 from flask_sqlalchemy import SQLAlchemy
+from config import db
+
+from service.task_service import TaskService
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
-db = SQLAlchemy(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///task_master.db'
+db.init_app(app)
 
-class Todo(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String(200), nullable=False)
-    completed = db.Column(db.Boolean, nullable=False, default=False)
-    date_created = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def __repr__(self):
-        return '<Task %r>' % self.id
+task_sertvice = TaskService()
 
 
 @app.route("/", methods=['GET', 'POST']) # type: ignore
@@ -21,43 +17,36 @@ def index():
     if request.method == 'POST':
         task_content = request.form['content']
         if not task_content or not task_content.isspace() or len(task_content) != 0:
-            print(f'Received task content: {task_content}')
-            new_task = Todo(content=task_content) # type: ignore
             try:
-                db.session.add(new_task)
-                db.session.commit()
+                task_sertvice.create_task(task_content)
                 return redirect('/')
             except:
                 return 'There was a problem.'
     else:
         try:
-            tasks = Todo.query.order_by(Todo.date_created).all()
+            tasks = task_sertvice.get_all_tasks()
             return render_template('index.html', tasks=tasks)
         except Exception as e:
             return render_template('index.html')
         
 @app.route('/delete/<int:id>')
 def delete(id):
-    task_to_delete = Todo.query.get_or_404(id)
     try:
-        db.session.delete(task_to_delete)
-        db.session.commit()
+        task_sertvice.delete_task(id)
         return redirect('/')
     except:
         return 'There was a problem deleting that task.'
     
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
-def update(id):
-    task = Todo.query.get_or_404(id)
+def update(id: int):
     if request.method == 'POST':
-        task.content = request.form['content']
         try:
-            db.session.commit()
+            task_sertvice.update_task(id, request.form['content'])
             return redirect('/')
         except:
             return 'There was a problem updating that task.'
     else:
-        return render_template('update.html', task=task)
+        return render_template('update.html', task=task_sertvice.get_task(id))
 
 
 if __name__ == '__main__':

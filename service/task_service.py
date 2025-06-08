@@ -1,0 +1,40 @@
+from model.task import Task
+from config import db
+
+# Business Logic Layer for Task Management
+class TaskService:
+    
+    # Retrieves all tasks ordered by their creation date
+    def get_all_tasks(self) -> list[Task]:
+        # Logic to retrieve all tasks
+        return Task.query.order_by(Task.date_created).all()
+    
+    # Retrieves a specific task by its ID
+    def get_task(self, task_id: int) -> Task:
+        # Logic to retrieve a task by its ID
+        return Task.query.get_or_404(task_id)
+        
+    # Creates a new task with the provided content
+    def create_task(self, task_content: str) -> Task | None:
+        # Logic to create a new task
+        if not task_content or not task_content.isspace() or len(task_content) != 0:
+            new_task = Task(content=task_content) # type: ignore
+            db.session.add(new_task)
+            db.session.commit()
+            return new_task
+        return None
+    
+    # Updates an existing task with new content
+    def update_task(self, task_id: int, content: str) -> Task:
+        task = self.get_task(task_id)
+        task.content = content
+        db.session.commit()
+        return self.get_task(task_id)
+    
+    # Deletes a task by its ID
+    def delete_task(self, task_id: int) -> None:
+        task_to_delete = self.get_task(task_id)
+        db.session.delete(task_to_delete)
+        db.session.commit()
+        
+            
