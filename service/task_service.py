@@ -1,8 +1,11 @@
+from logger.logger import Logger
 from model.task import Task
 from config import db
 
 # Business Logic Layer for Task Management
 class TaskService:
+    
+    LOGGER = Logger("TaskService").get_logger()
     
     # Retrieves all tasks ordered by their creation date
     def get_all_tasks(self) -> list[Task]:
@@ -17,7 +20,7 @@ class TaskService:
     # Creates a new task with the provided content
     def create_task(self, task_content: str) -> Task | None:
         # Logic to create a new task
-        if not task_content or not task_content.isspace() or len(task_content) != 0:
+        if len(task_content.strip()) != 0:
             new_task = Task(content=task_content) # type: ignore
             db.session.add(new_task)
             db.session.commit()
