@@ -1,2 +1,4 @@
-# taskmaster-python-project
-This is my python learning project. It defines a website that helps managing tasks
+# Task Master Python Project
+
+## Development Phases:
+1. Phase1: [![Phase1 Documentation]](docs/Phase1.md)
