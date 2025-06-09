@@ -53,3 +53,16 @@ def update(id: int):
                                    error_message = 'There was a problem updating that task.')
     else:
         return render_template('update.html', task=task_service.get_task(id))
+    
+@task_blueprint.route('/complete/<int:id>', methods=['GET'])
+def complete(id: int):
+    logger = Logger("TaskController").get_logger()
+    logger.info(f"Completing task with ID: {id}")
+    try:
+        task_service.complete_task(id)
+        logger.info(f"Task with ID {id} completed successfully.")
+        return redirect('/')
+    except Exception as e:
+        logger.error(f"Error completing task with ID {id}: {e}")
+        return render_template('error.html', 
+                               error_message = 'There was a problem completing that task.')

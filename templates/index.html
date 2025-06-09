@@ -31,13 +31,18 @@
             <td>{{ task.date_created.date() }}</td>
             <td>
               <div class="btn-group">
-                <a href="/delete/{{task.id}}" class="btn btn-outline-primary"
-                  >Delete</a
+                <a href="/delete/{{task.id}}" class="btn btn-outline-primary">
+                  Delete
+                </a>
+                <a href="/update/{{task.id}}" class="btn btn-outline-primary">
+                  Update
+                </a>
+                <a
+                  href="/complete/{{task.id}}"
+                  class="btn btn-outline-primary{% if task.completed %} disabled{% endif %}"
                 >
-                <a href="/update/{{task.id}}" class="btn btn-outline-primary"
-                  >Update</a
-                >
-                <a href="#" class="btn btn-outline-primary">Complete</a>
+                  Complete
+                </a>
               </div>
             </td>
           </tr>
