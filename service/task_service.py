@@ -1,3 +1,4 @@
+from typing import Optional
 from dto.update_task_request_dto import UpdateTaskRequestDto
 from logger.logger import Logger
 from model.task import Task
@@ -12,6 +13,18 @@ class TaskService:
     def get_all_tasks(self) -> list[Task]:
         # Logic to retrieve all tasks
         return Task.query.order_by(Task.date_created).all()
+    
+    # Retrieves all tasks ordered by their creation date
+    def get_all_tasks_filtered(self, filter: Optional[str] = None) -> list[Task]:
+        # Logic to retrieve all tasks
+        if filter == "finished":
+            return Task.query.filter_by(completed=True).order_by(Task.date_created).all()
+        elif filter == "open":
+            return Task.query.filter(Task.completed.is_(False)).order_by(Task.date_created).all()
+        elif filter == "all" or filter is None:
+            return self.get_all_tasks()
+        else:
+            raise ValueError(f"Invalid filter value: {filter}. Valid values are 'finished', 'open', 'all' or None.")
     
     # Retrieves a specific task by its ID
     def get_task(self, task_id: int) -> Task:
@@ -41,6 +54,12 @@ class TaskService:
     def delete_task(self, task_id: int) -> None:
         task_to_delete = self.get_task(task_id)
         db.session.delete(task_to_delete)
+        db.session.commit()
+    
+        # Deletes a task by its ID
+    def complete_task(self, task_id: int) -> None:
+        task_to_complate = self.get_task(task_id)
+        task_to_complate.completed = True
         db.session.commit()
         
             

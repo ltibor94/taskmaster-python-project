@@ -7,19 +7,21 @@ from service.task_service import TaskService
 task_blueprint = Blueprint('tasks', __name__)
 task_service = TaskService()
 
-@task_blueprint.route("/", methods=['GET', 'POST']) # type: ignore
-def index():
+@task_blueprint.route("/", methods=['GET', 'POST'])
+@task_blueprint.route("/<string:filter>", methods=['GET', 'POST'])
+def index(filter: Optional[str] = None):
+    Logger("TaskController").get_logger().info(f"Accessing task index with filter: {filter}")
     if request.method == 'POST':
         task_content = request.form['content']
         try:
             task_service.create_task(task_content)
             return redirect('/')
         except Exception as e:
-            render_template('error.html', 
+            return render_template('error.html', 
                             error_message = f'There was a problem new tasks: {e}')
     else:
         try:
-            tasks = task_service.get_all_tasks()
+            tasks = task_service.get_all_tasks_filtered(filter)
             return render_template('index.html', tasks=tasks)
         except Exception as e:
             return render_template('error.html', 
