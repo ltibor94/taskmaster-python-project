@@ -1,12 +1,40 @@
 {% extends 'base.html' %} {% block head %}
 <title>Update Task</title>
 {% endblock %} {% block body %}
-<div class="content">
-  <h1>Update Task</h1>
-
+<div class="container-sm">
   <form action="/update/{{task.id}}" method="POST">
-    <input type="text" name="content" id="content" value="{{task.content}}" />
-    <input type="submit" value="Update Task" />
+    <div class="mb-3">
+      <label for="content" class="form-label">Task Content</label>
+      <input
+        type="text"
+        name="content"
+        class="form-control"
+        id="content"
+        aria-describedby="task-content-text"
+        value="{{ task.content }}"
+      />
+      <div id="task-content-text" class="form-text">
+        You can update the content of your task here.
+      </div>
+    </div>
+    <div class="mb-3 form-check">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        id="completed"
+        name="completed"
+        {%
+        if
+        task.completed
+        %}checked{%
+        endif
+        %}
+      />
+      <label class="form-check-label" for="completed">
+        Mark as Completed
+      </label>
+    </div>
+    <input type="submit" value="Update" class="btn btn-primary" />
   </form>
 </div>
 {% endblock %}

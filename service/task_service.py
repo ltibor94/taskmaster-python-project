@@ -1,3 +1,4 @@
+from dto.update_task_request_dto import UpdateTaskRequestDto
 from logger.logger import Logger
 from model.task import Task
 from config import db
@@ -28,9 +29,11 @@ class TaskService:
         return None
     
     # Updates an existing task with new content
-    def update_task(self, task_id: int, content: str) -> Task:
+    def update_task(self, task_id: int, update_request: UpdateTaskRequestDto) -> Task:
+        self.LOGGER.info(f"Updating task with ID: {task_id} with content: {update_request.content} and completed status: {update_request.completed}")
         task = self.get_task(task_id)
-        task.content = content
+        task.content = update_request.content
+        task.completed = update_request.completed
         db.session.commit()
         return self.get_task(task_id)
     
